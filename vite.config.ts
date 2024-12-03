@@ -7,6 +7,14 @@ import VueRouter from 'unplugin-vue-router/vite';
 export default defineConfig({
 	plugins: [
 		VueRouter({
+			// what files to include
+			filePatterns: ['**/*'],
+
+			// files to exclude from the scan
+			exclude: [],
+
+			// where to generate the types
+			dts: './src/types/typed-router.d.ts',
 		}),
 		vue(),
 	],

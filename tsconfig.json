@@ -8,6 +8,7 @@
     },
   },
   "include": [
-    "./typed-router.d.ts"
+    "src/**/*.ts",
+    "src/**/*.vue",
   ]
 }
