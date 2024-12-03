@@ -8,4 +8,12 @@
       "path": "./tsconfig.node.json"
     }
   ],
+  "compilerOptions": {
+    "baseUrl": "./src", // 基本路径为 `src` 目录
+    "paths": {
+      "@/*": [
+        "*"
+      ] // 将 `@` 别名映射到 `src` 目录
+    }
+  }
 }
