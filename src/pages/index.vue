@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import Banner from './Banner.vue';
-import Footer from './Footer.vue';
-import ProductDisplay from '../products/ProductDisplay.vue';
+import Banner from './homepage/Banner.vue';
+import Footer from './homepage/Footer.vue';
+import ProductDisplay from './products/ProductDisplay.vue';
 </script>
 
 <style lang="css" scoped>
