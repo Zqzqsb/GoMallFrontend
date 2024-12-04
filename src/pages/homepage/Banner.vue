@@ -20,7 +20,7 @@
 		<v-btn icon>
 			<v-icon>mdi-account</v-icon>
 		</v-btn>
-		<v-btn class="bg-blue-400 rounded-lg" variant="elevated"> Login </v-btn>
+		<v-btn class="bg-blue-400 rounded-lg" variant="elevated" to="/login">  Login </v-btn>
 	</v-app-bar>
 </template>
 
