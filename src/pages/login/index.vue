@@ -1,58 +1,80 @@
 <template>
 	<div class="mt-10">
+		<!-- Card for the login form -->
 		<v-card
 			class="mx-auto pa-12 pb-8"
 			elevation="8"
 			max-width="448"
 			rounded="lg"
 		>
-			<div class="text-subtitle-1 text-medium-emphasis">Account</div>
+			<!-- Title Section -->
+			<div class="text-subtitle-1 text-medium-emphasis mb-6">Account</div>
 
-			<v-text-field
-				density="compact"
-				placeholder="Email address"
-				prepend-inner-icon="mdi-email-outline"
-				variant="outlined"
-			></v-text-field>
+			<!-- Login Form -->
+			<v-form v-model="valid" @submit.prevent="submitLogin">
+				<!-- Email Input -->
+				<v-text-field
+					v-model="email"
+					:rules="[emailRules]"
+					density="compact"
+					placeholder="Email address"
+					prepend-inner-icon="mdi-email-outline"
+					variant="outlined"
+					required
+				></v-text-field>
 
-			<div
-				class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
-			>
-				Password
-
-				<a
-					class="text-caption text-decoration-none text-blue"
-					href="#"
-					rel="noopener noreferrer"
-					target="_blank"
+				<!-- Password Section -->
+				<div
+					class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mb-2"
 				>
-					Forgot login password?</a
+					Password
+					<a
+						class="text-caption text-decoration-none text-blue"
+						href="#"
+						rel="noopener noreferrer"
+						target="_blank"
+					>
+						Forgot login password?
+					</a>
+				</div>
+
+				<!-- Password Input -->
+				<v-text-field
+					v-model="password"
+					:append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+					:type="visible ? 'text' : 'password'"
+					density="compact"
+					placeholder="Enter your password"
+					prepend-inner-icon="mdi-lock-outline"
+					variant="outlined"
+					@click:append-inner="togglePasswordVisibility"
+					required
+				></v-text-field>
+
+				<!-- Warning Message -->
+				<v-card class="mb-12" color="surface-variant" variant="tonal">
+					<v-card-text class="text-medium-emphasis text-caption">
+						Warning: After 3 consecutive failed login attempts, your
+						account will be temporarily locked for three hours. If
+						you must login now, you can also click "Forgot login
+						password?" below to reset the login password.
+					</v-card-text>
+				</v-card>
+
+				<!-- Login Button -->
+				<v-btn
+					type="submit"
+					class="mb-8"
+					color="blue"
+					size="large"
+					variant="tonal"
+					block
 				>
-			</div>
+					Log In
+				</v-btn>
+			</v-form>
 
-			<v-text-field
-				:append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-				:type="visible ? 'text' : 'password'"
-				density="compact"
-				placeholder="Enter your password"
-				prepend-inner-icon="mdi-lock-outline"
-				variant="outlined"
-				@click:append-inner="visible = !visible"
-			></v-text-field>
-
-			<v-card class="mb-12" color="surface-variant" variant="tonal">
-				<v-card-text class="text-medium-emphasis text-caption">
-					Warning: After 3 consecutive failed login attempts, you
-					account will be temporarily locked for three hours. If you
-					must login now, you can also click "Forgot login password?"
-					below to reset the login password.
-				</v-card-text>
-			</v-card>
-
-			<v-btn class="mb-8" color="blue" size="large" variant="tonal" block>
-				Log In
-			</v-btn>
-
+			<!-- Sign Up Link -->
 			<v-card-text class="text-center">
 				<a
 					class="text-blue text-decoration-none"
@@ -68,6 +90,47 @@
 </template>
 
 <script setup lang="ts">
+import { login } from '@/apis/user';
 import { ref } from 'vue';
-const visible = ref(false);
+
+// Reactive data for email and password
+const email = ref('');
+const password = ref('');
+const valid = ref(false); // Form validity check
+const visible = ref(false); // Toggle password visibility
+
+// Validation rules
+const emailRules = [
+	(v) => !!v || 'Email is required',
+	(v) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+];
+
+// Toggle visibility for password input
+const togglePasswordVisibility = () => {
+	visible.value = !visible.value;
+};
+
+// Submit login function
+const submitLogin = async () => {
+	if (valid.value) {
+		try {
+			const response = await login({
+				email: email.value,
+				password: password.value,
+			});
+			// Handle the response from the login API
+			if (response.success) {
+				// Redirect to the next page or show a success message
+				console.log('Login successful');
+			} else {
+				// Handle login failure (e.g., show error message)
+				console.error('Login failed');
+			}
+		} catch (error) {
+			console.error('Error logging in:', error);
+		}
+	} else {
+		console.log('Form is not valid');
+	}
+};
 </script>

@@ -1,0 +1,96 @@
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import * as user from '../user';
+
+// 创建一个 MockAdapter 实例
+let mock: MockAdapter;
+
+beforeAll(() => {
+	// 初始化 MockAdapter
+	mock = new MockAdapter(axios);
+});
+
+afterEach(() => {
+	// 清除 mock 数据，以确保不会干扰到其他测试
+	mock.reset();
+});
+
+afterAll(() => {
+	// 恢复原始的 axios 实例
+	mock.restore();
+});
+
+describe('register function', () => {
+	it('should register successfully and return a user ID', async () => {
+		const mockData: user.RegisterResponse = { userId: 123 };
+		const requestData: user.RegisterRequest = {
+			email: 'test@example.com',
+			password: 'password123',
+			passwordConfirm: 'password123',
+		};
+
+		// Mock API 返回成功的响应
+		mock.onPost('http://localhost:8888/register').reply(200, mockData);
+
+		// 调用 register 函数
+		const result = await user.register(requestData);
+
+		// 断言结果
+		expect(result.userId).toBe(mockData.userId);
+	});
+
+	it('should throw an error when registration fails', async () => {
+		const requestData: user.RegisterRequest = {
+			email: 'test@example.com',
+			password: 'password123',
+			passwordConfirm: 'password123',
+		};
+
+		// Mock API 返回失败的响应
+		mock.onPost('http://localhost:8888/register').reply(400, {
+			message: 'Registration failed',
+		});
+
+		// 测试 register 函数是否抛出正确的错误
+		await expect(user.register(requestData)).rejects.toThrow(
+			'Registration failed'
+		);
+	});
+});
+
+describe('login function', () => {
+	it('should successfully login and return userId', async () => {
+		// 模拟成功的 API 响应
+		const mockResponse: user.LoginResponse = { userId: 1 };
+
+		// 配置 mock 返回值
+		mock.onPost('http://localhost:8888/login').reply(200, mockResponse);
+
+		const loginData: user.LoginRequest = {
+			email: 'user@example.com',
+			password: 'password123',
+		};
+
+		// 调用 login 函数
+		const response = await user.login(loginData);
+
+		// 验证结果
+		expect(response).toEqual(mockResponse);
+		expect(response.userId).toBe(1);
+	});
+
+	it('should throw an error if login fails', async () => {
+		// 模拟失败的 API 响应
+		mock.onPost('http://localhost:8888/login').reply(400, {
+			message: 'Invalid credentials',
+		});
+
+		const loginData: user.LoginRequest = {
+			email: 'wrong@example.com',
+			password: 'wrongpassword',
+		};
+
+		// 测试 login 函数是否抛出正确的错误
+		await expect(user.login(loginData)).rejects.toThrow('Login failed');
+	});
+});
