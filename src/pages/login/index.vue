@@ -15,7 +15,7 @@
 				<!-- Email Input -->
 				<v-text-field
 					v-model="email"
-					:rules="[emailRules]"
+					:rules="[emailRules as any]"
 					density="compact"
 					placeholder="Email address"
 					prepend-inner-icon="mdi-email-outline"
@@ -118,8 +118,9 @@ const submitLogin = async () => {
 				email: email.value,
 				password: password.value,
 			});
+			console.log('Response:', response);
 			// Handle the response from the login API
-			if (response.success) {
+			if (response.user_id > 0) {
 				// Redirect to the next page or show a success message
 				console.log('Login successful');
 			} else {

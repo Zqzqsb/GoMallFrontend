@@ -9,7 +9,7 @@ export interface LoginRequest {
 
 // 定义登录响应的数据结构
 export interface LoginResponse {
-	userId: number;
+	user_id: number;
 }
 
 // 创建一个登录 API 函数
