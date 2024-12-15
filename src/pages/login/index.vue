@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { login } from '@/apis/user';
+import { login } from '@/apis/auth';
 import { ref } from 'vue';
 
 // Reactive data for email and password
