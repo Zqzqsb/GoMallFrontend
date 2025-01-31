@@ -9,7 +9,9 @@
 				<v-row class="my-4">
 					<v-col>
 						<h1 class="text-h4">Welcome to GoMall</h1>
-						<p class="text-subtitle-1">Discover our featured products</p>
+						<p class="text-subtitle-1">
+							Discover our featured products
+						</p>
 					</v-col>
 				</v-row>
 
@@ -37,7 +39,9 @@
 								<div class="text-subtitle-1 mb-1">
 									${{ product.price.toFixed(2) }}
 								</div>
-								<div class="text-body-2">{{ product.description }}</div>
+								<div class="text-body-2">
+									{{ product.description }}
+								</div>
 							</v-card-text>
 
 							<v-card-actions>
@@ -81,7 +85,8 @@ const mockProducts = ref([
 		id: 3,
 		name: 'Laptop Backpack',
 		price: 49.99,
-		description: 'Water-resistant laptop backpack with multiple compartments',
+		description:
+			'Water-resistant laptop backpack with multiple compartments',
 		image: 'https://picsum.photos/id/3/500/300',
 	},
 	{
