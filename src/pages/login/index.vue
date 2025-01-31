@@ -19,6 +19,8 @@
                 placeholder="your.email@example.com"
                 prepend-inner-icon="mdi-email-outline"
                 variant="outlined"
+                hide-details
+                class="mb-4"
                 required
             ></v-text-field>
 
@@ -32,6 +34,8 @@
                 placeholder="输入您的密码"
                 prepend-inner-icon="mdi-lock-outline"
                 variant="outlined"
+                hide-details
+                class="mb-4"
                 @click:append-inner="togglePasswordVisibility"
                 required
             ></v-text-field>
@@ -47,6 +51,8 @@
                 placeholder="再次输入密码"
                 prepend-inner-icon="mdi-lock-outline"
                 variant="outlined"
+                hide-details
+                class="mb-4"
                 @click:append-inner="togglePasswordConfirmVisibility"
                 required
             ></v-text-field>

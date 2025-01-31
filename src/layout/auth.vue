@@ -12,19 +12,30 @@
                 <v-row no-gutters justify="center" align="center">
                     <!-- 左侧品牌区域 -->
                     <v-col cols="12" md="6" class="d-none d-md-flex brand-section">
-                        <div class="brand-content text-center">
+                        <div class="brand-content">
                             <v-img
                                 src="@/assets/images/logo.png"
                                 alt="Logo"
                                 max-width="200"
-                                class="mx-auto mb-8"
+                                class="mb-8"
                             ></v-img>
-                            <h1 class="text-h3 font-weight-bold mb-4 text-primary">
+                            <h1 class="text-h3 font-weight-bold mb-4 text-white">
                                 欢迎来到 GoMall
                             </h1>
-                            <p class="text-body-1 text-medium-emphasis">
+                            <p class="text-h6 text-white text-opacity-75 mb-8">
                                 您的一站式购物平台
                             </p>
+                            <v-btn
+                                color="white"
+                                variant="outlined"
+                                size="x-large"
+                                to="/homepage"
+                                class="browse-btn"
+                                prepend-icon="mdi-shopping"
+                            >
+                                随便逛逛
+                                <v-icon end icon="mdi-arrow-right" class="ml-2"></v-icon>
+                            </v-btn>
                         </div>
                     </v-col>
 
@@ -103,8 +114,9 @@
 }
 
 .brand-content {
-    color: white;
     max-width: 400px;
+    text-align: left;
+    padding-left: 3rem;
 }
 
 .auth-content {
@@ -119,6 +131,19 @@
 .auth-card {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
+}
+
+.browse-btn {
+    border-width: 2px;
+    letter-spacing: 1px;
+    text-transform: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.browse-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
 }
 
 @media (max-width: 959px) {
