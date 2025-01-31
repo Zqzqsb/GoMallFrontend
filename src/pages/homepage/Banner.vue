@@ -6,20 +6,28 @@
 		<v-spacer></v-spacer>
 
 		<v-text-field
+			v-model="search"
 			:loading="loading"
-			:model-value="search"
-			append-inner-icon="mdi-magnify"
 			density="compact"
+			variant="outlined"
 			label="搜索商品"
-			variant="solo"
-			hide-details
+			append-inner-icon="mdi-magnify"
 			single-line
+			hide-details
 			@click:append-inner="onClick"
-			class="max-w-[300px] mr-4"
 		></v-text-field>
 
-		<!-- Shopping Cart -->
-		<v-btn icon class="mr-2" @click="goToCart">
+		<v-btn
+			color="primary"
+			variant="text"
+			class="ml-4"
+			to="/intro"
+			prepend-icon="mdi-information"
+		>
+			项目介绍
+		</v-btn>
+
+		<v-btn icon class="ml-4" @click="goToCart">
 			<v-badge
 				:content="cartItemCount"
 				:model-value="cartItemCount > 0"
