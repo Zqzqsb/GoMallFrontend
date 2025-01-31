@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import { getCsrfToken } from '@/apis/auth';
 
 // Router
 import { createRouter, createWebHistory } from 'vue-router';
@@ -21,5 +22,10 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
 const vuetify = createVuetify({ components, directives });
+
+// Fetch CSRF token on app startup
+getCsrfToken().catch(error => {
+    console.error('Failed to fetch CSRF token on startup:', error);
+});
 
 createApp(App).use(vuetify).use(router).mount('#app');
