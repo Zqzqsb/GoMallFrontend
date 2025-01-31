@@ -1,103 +1,142 @@
 <template>
-	<v-card
-		:disabled="loading"
-		:loading="loading"
-		class="mx-auto my-12"
-		max-width="374"
-	>
-		<template v-slot:loader="{ isActive }">
-			<v-progress-linear
-				:active="isActive"
-				color="deep-purple"
-				height="4"
-				indeterminate
-			></v-progress-linear>
-		</template>
+    <div class="product-display">
+        <!-- Welcome Message -->
+        <v-container>
+            <v-row class="my-4">
+                <v-col>
+                    <h1 class="text-h4">欢迎来到 GoMall</h1>
+                    <p class="text-subtitle-1">发现精选商品</p>
+                </v-col>
+            </v-row>
 
-		<v-img
-			height="250"
-			src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-			cover
-		></v-img>
+            <!-- Products Grid -->
+            <v-row>
+                <v-col
+                    v-for="product in displayedProducts"
+                    :key="product.id"
+                    cols="12"
+                    sm="6"
+                    md="4"
+                    lg="3"
+                >
+                    <v-card class="mb-4 product-card" elevation="2" hover>
+                        <v-img
+                            :src="product.image"
+                            height="200"
+                            cover
+                            class="bg-grey-lighten-2"
+                        >
+                            <template v-slot:placeholder>
+                                <v-row
+                                    class="fill-height ma-0"
+                                    align="center"
+                                    justify="center"
+                                >
+                                    <v-progress-circular
+                                        indeterminate
+                                        color="primary"
+                                    ></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
 
-		<v-card-item>
-			<v-card-title>Cafe Badilico</v-card-title>
+                        <v-card-title class="text-truncate">{{ product.name }}</v-card-title>
 
-			<v-card-subtitle>
-				<span class="me-1">Local Favorite</span>
+                        <v-card-text>
+                            <div class="text-subtitle-1 font-weight-bold primary--text mb-1">
+                                ￥{{ product.price.toFixed(2) }}
+                            </div>
+                            <div class="text-body-2 text-truncate-2">{{ product.description }}</div>
+                        </v-card-text>
 
-				<v-icon
-					color="error"
-					icon="mdi-fire-circle"
-					size="small"
-				></v-icon>
-			</v-card-subtitle>
-		</v-card-item>
+                        <v-card-actions>
+                            <v-btn 
+                                color="primary" 
+                                variant="tonal" 
+                                block
+                                :loading="product.loading"
+                                @click="addToCart(product)"
+                            >
+                                加入购物车
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-col>
+            </v-row>
 
-		<v-card-text>
-			<v-row align="center" class="mx-0">
-				<v-rating
-					:model-value="4.5"
-					color="amber"
-					density="compact"
-					size="small"
-					half-increments
-					readonly
-				></v-rating>
-
-				<div class="text-grey ms-4">4.5 (413)</div>
-			</v-row>
-
-			<div class="my-4 text-subtitle-1">$ • Italian, Cafe</div>
-
-			<div>
-				Small plates, salads & sandwiches - an intimate setting with 12
-				indoor seats plus patio seating.
-			</div>
-		</v-card-text>
-
-		<v-divider class="mx-4 mb-1"></v-divider>
-
-		<v-card-title>Tonight's availability</v-card-title>
-
-		<div class="px-4 mb-2">
-			<v-chip-group
-				v-model="selection"
-				selected-class="bg-deep-purple-lighten-2"
-			>
-				<v-chip value="5:30PM">5:30PM</v-chip>
-
-				<v-chip value="7:30PM">7:30PM</v-chip>
-
-				<v-chip value="8:00PM">8:00PM</v-chip>
-
-				<v-chip value="9:00PM">9:00PM</v-chip>
-			</v-chip-group>
-		</div>
-
-		<v-card-actions>
-			<v-btn
-				color="deep-purple-lighten-2"
-				text="Reserve"
-				block
-				border
-				@click="reserve"
-				:loading="loading"
-			></v-btn>
-		</v-card-actions>
-	</v-card>
+            <!-- Pagination -->
+            <v-row class="mt-4">
+                <v-col class="d-flex justify-center">
+                    <v-pagination
+                        v-model="currentPage"
+                        :length="totalPages"
+                        :total-visible="7"
+                        rounded="circle"
+                    ></v-pagination>
+                </v-col>
+            </v-row>
+        </v-container>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-const loading = ref(false);
-const selection = ref('5:30PM'); // 修改为字符串类型，表示选中的时间
+import { ref, computed } from 'vue';
 
-const reserve = () => {
-	loading.value = true;
-	setTimeout(() => {
-		loading.value = false;
-		alert(`Reserved for ${selection.value}`); // 仅用于调试，显示选中的时间
-	}, 2000);
+// Mock products data with more items
+const products = ref(Array.from({ length: 32 }, (_, i) => ({
+    id: i + 1,
+    name: `商品 ${i + 1}`,
+    price: Math.floor(Math.random() * 900 + 100),
+    description: `这是商品 ${i + 1} 的详细描述，包含了产品的主要特点和优势。`,
+    image: `https://picsum.photos/id/${(i % 10) + 1}/500/300`,
+    loading: false
+})));
+
+// Pagination
+const itemsPerPage = 12;
+const currentPage = ref(1);
+
+const totalPages = computed(() => Math.ceil(products.value.length / itemsPerPage));
+
+const displayedProducts = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return products.value.slice(start, end);
+});
+
+// Add to cart functionality
+const addToCart = async (product: any) => {
+    product.loading = true;
+    try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // TODO: Implement actual add to cart logic
+        console.log('Added to cart:', product.name);
+    } finally {
+        product.loading = false;
+    }
 };
 </script>
+
+<style scoped>
+.product-display {
+    min-height: calc(100vh - 64px - 200px); /* Adjust based on header and footer height */
+}
+
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
