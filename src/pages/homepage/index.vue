@@ -1,13 +1,7 @@
 <template>
 	<v-app>
 		<!-- Navigation Bar -->
-		<v-app-bar color="primary">
-			<v-app-bar-title>GoMall</v-app-bar-title>
-			<v-spacer></v-spacer>
-			<v-btn icon @click="handleLogout">
-				<v-icon>mdi-logout</v-icon>
-			</v-btn>
-		</v-app-bar>
+		<Banner />
 
 		<v-main>
 			<v-container>
@@ -63,6 +57,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { logout } from '@/apis/auth';
+import Banner from './Banner.vue'; // Make sure to import the Banner component
 
 const router = useRouter();
 
