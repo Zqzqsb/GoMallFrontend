@@ -8,8 +8,8 @@
             </div>
 
             <!-- 主要内容区 -->
-            <v-container fluid class="fill-height">
-                <v-row no-gutters justify="center" align="center">
+            <v-container fluid class="fill-height pa-0">
+                <v-row no-gutters class="fill-height">
                     <!-- 左侧品牌区域 -->
                     <v-col cols="12" md="6" class="d-none d-md-flex brand-section">
                         <div class="brand-content">
@@ -44,7 +44,7 @@
                         <v-sheet
                             width="100%"
                             max-width="480"
-                            class="mx-auto pa-8 auth-card"
+                            class="mx-auto auth-card"
                             rounded="lg"
                             elevation="4"
                         >
@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-// 组件逻辑
+// No script needed
 </script>
 
 <style scoped>
@@ -66,6 +66,7 @@
     position: relative;
     min-height: 100vh;
     background-color: rgb(245, 245, 245);
+    overflow: hidden;
 }
 
 .auth-background {
@@ -109,14 +110,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 }
 
 .brand-content {
     max-width: 400px;
     text-align: left;
-    padding-left: 3rem;
+    padding: 0 3rem;
 }
 
 .auth-content {
@@ -124,13 +124,15 @@
     z-index: 1;
     display: flex;
     align-items: center;
-    min-height: 100vh;
-    padding: 2rem;
+    justify-content: center;
+    height: 100vh;
+    background: transparent;
 }
 
 .auth-card {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
+    margin: 2rem;
 }
 
 .browse-btn {
@@ -148,7 +150,11 @@
 
 @media (max-width: 959px) {
     .auth-content {
-        min-height: 100vh;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+    
+    .auth-card {
+        margin: 1rem;
     }
 }
 </style>

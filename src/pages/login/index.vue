@@ -1,11 +1,12 @@
 <template>
     <AuthLayout>
-        <v-container class="fill-height">
+        <div class="pa-8">
+            <!-- Title Section -->
             <div class="text-center mb-8">
-                <h2 class="text-h4 font-weight-bold mb-2">
+                <h1 class="text-h3 font-weight-bold mb-4">
                     {{ isLogin ? '欢迎回来' : '创建账号' }}
-                </h2>
-                <p class="text-body-1 text-medium-emphasis">
+                </h1>
+                <p class="text-h6 text-medium-emphasis">
                     {{ isLogin ? '请登录您的账号' : '填写以下信息创建您的账号' }}
                 </p>
             </div>
@@ -20,8 +21,10 @@
                     placeholder="your.email@example.com"
                     prepend-inner-icon="mdi-email-outline"
                     variant="outlined"
-                    hide-details
-                    class="mb-4"
+                    class="mb-6"
+                    :error-messages="emailError"
+                    @update:modelValue="emailError = ''"
+                    hide-details="auto"
                     required
                 ></v-text-field>
 
@@ -32,12 +35,14 @@
                     :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
                     :type="visible ? 'text' : 'password'"
                     label="密码"
-                    placeholder="输入您的密码"
+                    placeholder="8-20位，包含大小写字母、数字和特殊字符"
                     prepend-inner-icon="mdi-lock-outline"
                     variant="outlined"
-                    hide-details
-                    class="mb-4"
+                    class="mb-6"
+                    :error-messages="passwordError"
+                    @update:modelValue="passwordError = ''"
                     @click:append-inner="togglePasswordVisibility"
+                    hide-details="auto"
                     required
                 ></v-text-field>
 
@@ -52,9 +57,11 @@
                     placeholder="再次输入密码"
                     prepend-inner-icon="mdi-lock-outline"
                     variant="outlined"
-                    hide-details
-                    class="mb-4"
+                    class="mb-6"
+                    :error-messages="confirmError"
+                    @update:modelValue="confirmError = ''"
                     @click:append-inner="togglePasswordConfirmVisibility"
+                    hide-details="auto"
                     required
                 ></v-text-field>
 
@@ -63,7 +70,7 @@
                     v-if="error"
                     type="error"
                     variant="tonal"
-                    class="mb-4"
+                    class="mb-6"
                     closable
                     @click:close="error = ''"
                 >
@@ -75,7 +82,7 @@
                     v-if="success"
                     type="success"
                     variant="tonal"
-                    class="mb-4"
+                    class="mb-6"
                     closable
                     @click:close="success = ''"
                 >
@@ -86,10 +93,11 @@
                 <v-btn
                     type="submit"
                     color="primary"
-                    size="large"
+                    size="x-large"
                     block
                     :loading="loading"
-                    class="mb-4"
+                    class="mb-6"
+                    height="56"
                 >
                     {{ isLogin ? '登录' : '注册' }}
                 </v-btn>
@@ -99,13 +107,15 @@
                     <v-btn
                         variant="text"
                         color="primary"
+                        size="large"
+                        class="text-body-1"
                         @click="toggleMode"
                     >
                         {{ isLogin ? '还没有账号？立即注册' : '已有账号？立即登录' }}
                     </v-btn>
                 </div>
             </v-form>
-        </v-container>
+        </div>
     </AuthLayout>
 </template>
 
@@ -117,33 +127,101 @@ import { login, register } from '@/apis/auth';
 
 const router = useRouter();
 
-// Form data
-const email = ref('');
-const password = ref('');
-const passwordConfirm = ref('');
+// Form state
 const valid = ref(false);
-const visible = ref(false);
-const visibleConfirm = ref(false);
 const loading = ref(false);
 const error = ref('');
 const success = ref('');
 const isLogin = ref(true);
 
+// Form fields
+const email = ref('');
+const password = ref('');
+const passwordConfirm = ref('');
+const emailError = ref('');
+const passwordError = ref('');
+const confirmError = ref('');
+
+// Password visibility
+const visible = ref(false);
+const visibleConfirm = ref(false);
+
 // Validation rules
 const emailRules = [
-    (v: string) => !!v || '请输入邮箱地址',
-    (v: string) => /.+@.+\..+/.test(v) || '请输入有效的邮箱地址',
+    (v: string) => {
+        if (!v) {
+            emailError.value = '请输入邮箱地址';
+            return false;
+        }
+        if (!/.+@.+\..+/.test(v)) {
+            emailError.value = '请输入有效的邮箱地址';
+            return false;
+        }
+        return true;
+    }
 ];
 
 const passwordRules = [
-    (v: string) => !!v || '请输入密码',
-    (v: string) =>
-        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v) ||
-        '密码必须包含至少8个字符，包括字母、数字和特殊字符',
+    (v: string) => {
+        if (!v) {
+            passwordError.value = '请输入密码';
+            return false;
+        }
+        
+        // 检查密码长度（8-20位）
+        if (v.length < 8 || v.length > 20) {
+            passwordError.value = '密码长度必须在8-20位之间';
+            return false;
+        }
+        
+        // 检查是否包含至少一个大写字母
+        if (!/[A-Z]/.test(v)) {
+            passwordError.value = '密码必须包含至少一个大写字母';
+            return false;
+        }
+        
+        // 检查是否包含至少一个小写字母
+        if (!/[a-z]/.test(v)) {
+            passwordError.value = '密码必须包含至少一个小写字母';
+            return false;
+        }
+        
+        // 检查是否包含至少一个数字
+        if (!/\d/.test(v)) {
+            passwordError.value = '密码必须包含至少一个数字';
+            return false;
+        }
+        
+        // 检查是否包含至少一个特殊字符
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(v)) {
+            passwordError.value = '密码必须包含至少一个特殊字符 (!@#$%^&*(),.?":{}|<>)';
+            return false;
+        }
+        
+        // 检查是否包含连续的重复字符
+        if (/(.)\1{2,}/.test(v)) {
+            passwordError.value = '密码不能包含连续重复的字符';
+            return false;
+        }
+        
+        // 检查是否包含常见的键盘连续字符
+        const commonSequences = ['qwerty', 'asdfgh', '123456', 'abcdef'];
+        if (commonSequences.some(seq => v.toLowerCase().includes(seq))) {
+            passwordError.value = '密码不能包含连续的键盘字符';
+            return false;
+        }
+
+        return true;
+    }
 ];
 
-const passwordMatchRule = (v: string) =>
-    v === password.value || '两次输入的密码不一致';
+const passwordMatchRule = (v: string) => {
+    if (v !== password.value) {
+        confirmError.value = '两次输入的密码不一致';
+        return false;
+    }
+    return true;
+};
 
 // Toggle password visibility
 const togglePasswordVisibility = () => {
@@ -154,22 +232,43 @@ const togglePasswordConfirmVisibility = () => {
     visibleConfirm.value = !visibleConfirm.value;
 };
 
-// Toggle between login and register modes
+// Toggle between login and register
 const toggleMode = () => {
     isLogin.value = !isLogin.value;
     error.value = '';
     success.value = '';
+    email.value = '';
+    password.value = '';
+    passwordConfirm.value = '';
+    emailError.value = '';
+    passwordError.value = '';
+    confirmError.value = '';
 };
 
 // Handle form submission
 const handleSubmit = async () => {
-    if (!valid.value) {
-        error.value = '请修正表单中的错误后再提交';
-        return;
+    // 清除所有错误信息
+    emailError.value = '';
+    passwordError.value = '';
+    confirmError.value = '';
+    error.value = '';
+
+    // 手动验证表单
+    const isEmailValid = emailRules[0](email.value);
+    const isPasswordValid = passwordRules[0](password.value);
+    
+    if (!isLogin.value) {
+        const isPasswordConfirmValid = passwordMatchRule(passwordConfirm.value);
+        if (!isEmailValid || !isPasswordValid || !isPasswordConfirmValid) {
+            return;
+        }
+    } else {
+        if (!isEmailValid || !isPasswordValid) {
+            return;
+        }
     }
 
     loading.value = true;
-    error.value = '';
     success.value = '';
 
     try {
@@ -196,11 +295,28 @@ const handleSubmit = async () => {
             }, 1500);
         }
     } catch (err: any) {
-        error.value =
-            err.response?.data?.message ||
-            '发生错误，请稍后重试。';
+        error.value = err.response?.data?.message || '发生错误，请稍后重试。';
     } finally {
         loading.value = false;
     }
 };
 </script>
+
+<style scoped>
+:deep(.v-field) {
+    font-size: 1.1rem;
+}
+
+:deep(.v-label) {
+    font-size: 1.1rem;
+}
+
+:deep(.v-btn) {
+    text-transform: none;
+    font-size: 1.1rem;
+}
+
+:deep(.v-alert) {
+    font-size: 1.1rem;
+}
+</style>
