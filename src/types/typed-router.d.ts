@@ -24,6 +24,11 @@ declare module 'vue-router/auto-routes' {
     '/homepage/Footer': RouteRecordInfo<'/homepage/Footer', '/homepage/Footer', Record<never, never>, Record<never, never>>,
     '/homepage/ProductDisplay': RouteRecordInfo<'/homepage/ProductDisplay', '/homepage/ProductDisplay', Record<never, never>, Record<never, never>>,
     '/intro/': RouteRecordInfo<'/intro/', '/intro', Record<never, never>, Record<never, never>>,
+    '/intro/components/Background': RouteRecordInfo<'/intro/components/Background', '/intro/components/Background', Record<never, never>, Record<never, never>>,
+    '/intro/components/EnterButton': RouteRecordInfo<'/intro/components/EnterButton', '/intro/components/EnterButton', Record<never, never>, Record<never, never>>,
+    '/intro/components/Header': RouteRecordInfo<'/intro/components/Header', '/intro/components/Header', Record<never, never>, Record<never, never>>,
+    '/intro/components/ProjectInfo': RouteRecordInfo<'/intro/components/ProjectInfo', '/intro/components/ProjectInfo', Record<never, never>, Record<never, never>>,
+    '/intro/components/TechStack': RouteRecordInfo<'/intro/components/TechStack', '/intro/components/TechStack', Record<never, never>, Record<never, never>>,
     '/login/': RouteRecordInfo<'/login/', '/login', Record<never, never>, Record<never, never>>,
   }
 }
