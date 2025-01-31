@@ -1,116 +1,118 @@
 <template>
     <AuthLayout>
-        <div class="text-center mb-8">
-            <h2 class="text-h4 font-weight-bold mb-2">
-                {{ isLogin ? '欢迎回来' : '创建账号' }}
-            </h2>
-            <p class="text-body-1 text-medium-emphasis">
-                {{ isLogin ? '请登录您的账号' : '填写以下信息创建您的账号' }}
-            </p>
-        </div>
-
-        <!-- Login/Register Form -->
-        <v-form v-model="valid" @submit.prevent="handleSubmit">
-            <!-- Email Input -->
-            <v-text-field
-                v-model="email"
-                :rules="emailRules"
-                label="邮箱地址"
-                placeholder="your.email@example.com"
-                prepend-inner-icon="mdi-email-outline"
-                variant="outlined"
-                hide-details
-                class="mb-4"
-                required
-            ></v-text-field>
-
-            <!-- Password Input -->
-            <v-text-field
-                v-model="password"
-                :rules="passwordRules"
-                :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-                :type="visible ? 'text' : 'password'"
-                label="密码"
-                placeholder="输入您的密码"
-                prepend-inner-icon="mdi-lock-outline"
-                variant="outlined"
-                hide-details
-                class="mb-4"
-                @click:append-inner="togglePasswordVisibility"
-                required
-            ></v-text-field>
-
-            <!-- Confirm Password (Register only) -->
-            <v-text-field
-                v-if="!isLogin"
-                v-model="passwordConfirm"
-                :rules="[...passwordRules, passwordMatchRule]"
-                :append-inner-icon="visibleConfirm ? 'mdi-eye-off' : 'mdi-eye'"
-                :type="visibleConfirm ? 'text' : 'password'"
-                label="确认密码"
-                placeholder="再次输入密码"
-                prepend-inner-icon="mdi-lock-outline"
-                variant="outlined"
-                hide-details
-                class="mb-4"
-                @click:append-inner="togglePasswordConfirmVisibility"
-                required
-            ></v-text-field>
-
-            <!-- Error Alert -->
-            <v-alert
-                v-if="error"
-                type="error"
-                variant="tonal"
-                class="mb-4"
-                closable
-                @click:close="error = ''"
-            >
-                {{ error }}
-            </v-alert>
-
-            <!-- Success Alert -->
-            <v-alert
-                v-if="success"
-                type="success"
-                variant="tonal"
-                class="mb-4"
-                closable
-                @click:close="success = ''"
-            >
-                {{ success }}
-            </v-alert>
-
-            <!-- Submit Button -->
-            <v-btn
-                type="submit"
-                color="primary"
-                size="large"
-                block
-                :loading="loading"
-                class="mb-4"
-            >
-                {{ isLogin ? '登录' : '注册' }}
-            </v-btn>
-
-            <!-- Toggle Login/Register -->
-            <div class="text-center">
-                <v-btn
-                    variant="text"
-                    color="primary"
-                    @click="toggleMode"
-                >
-                    {{ isLogin ? '还没有账号？立即注册' : '已有账号？立即登录' }}
-                </v-btn>
+        <v-container class="fill-height">
+            <div class="text-center mb-8">
+                <h2 class="text-h4 font-weight-bold mb-2">
+                    {{ isLogin ? '欢迎回来' : '创建账号' }}
+                </h2>
+                <p class="text-body-1 text-medium-emphasis">
+                    {{ isLogin ? '请登录您的账号' : '填写以下信息创建您的账号' }}
+                </p>
             </div>
-        </v-form>
+
+            <!-- Login/Register Form -->
+            <v-form v-model="valid" @submit.prevent="handleSubmit">
+                <!-- Email Input -->
+                <v-text-field
+                    v-model="email"
+                    :rules="emailRules"
+                    label="邮箱地址"
+                    placeholder="your.email@example.com"
+                    prepend-inner-icon="mdi-email-outline"
+                    variant="outlined"
+                    hide-details
+                    class="mb-4"
+                    required
+                ></v-text-field>
+
+                <!-- Password Input -->
+                <v-text-field
+                    v-model="password"
+                    :rules="passwordRules"
+                    :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+                    :type="visible ? 'text' : 'password'"
+                    label="密码"
+                    placeholder="输入您的密码"
+                    prepend-inner-icon="mdi-lock-outline"
+                    variant="outlined"
+                    hide-details
+                    class="mb-4"
+                    @click:append-inner="togglePasswordVisibility"
+                    required
+                ></v-text-field>
+
+                <!-- Confirm Password (Register only) -->
+                <v-text-field
+                    v-if="!isLogin"
+                    v-model="passwordConfirm"
+                    :rules="[...passwordRules, passwordMatchRule]"
+                    :append-inner-icon="visibleConfirm ? 'mdi-eye-off' : 'mdi-eye'"
+                    :type="visibleConfirm ? 'text' : 'password'"
+                    label="确认密码"
+                    placeholder="再次输入密码"
+                    prepend-inner-icon="mdi-lock-outline"
+                    variant="outlined"
+                    hide-details
+                    class="mb-4"
+                    @click:append-inner="togglePasswordConfirmVisibility"
+                    required
+                ></v-text-field>
+
+                <!-- Error Alert -->
+                <v-alert
+                    v-if="error"
+                    type="error"
+                    variant="tonal"
+                    class="mb-4"
+                    closable
+                    @click:close="error = ''"
+                >
+                    {{ error }}
+                </v-alert>
+
+                <!-- Success Alert -->
+                <v-alert
+                    v-if="success"
+                    type="success"
+                    variant="tonal"
+                    class="mb-4"
+                    closable
+                    @click:close="success = ''"
+                >
+                    {{ success }}
+                </v-alert>
+
+                <!-- Submit Button -->
+                <v-btn
+                    type="submit"
+                    color="primary"
+                    size="large"
+                    block
+                    :loading="loading"
+                    class="mb-4"
+                >
+                    {{ isLogin ? '登录' : '注册' }}
+                </v-btn>
+
+                <!-- Toggle Login/Register -->
+                <div class="text-center">
+                    <v-btn
+                        variant="text"
+                        color="primary"
+                        @click="toggleMode"
+                    >
+                        {{ isLogin ? '还没有账号？立即注册' : '已有账号？立即登录' }}
+                    </v-btn>
+                </div>
+            </v-form>
+        </v-container>
     </AuthLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import AuthLayout from '@/layout/auth.vue';
+import AuthLayout from '@/layout/AuthLayout.vue';
 import { login, register } from '@/apis/auth';
 
 const router = useRouter();
