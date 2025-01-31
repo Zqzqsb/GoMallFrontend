@@ -8,14 +8,16 @@
 			rounded="lg"
 		>
 			<!-- Title Section -->
-			<div class="text-subtitle-1 text-medium-emphasis mb-6">Account</div>
+			<div class="text-subtitle-1 text-medium-emphasis mb-6">
+				{{ isLogin ? 'Login' : 'Register' }}
+			</div>
 
-			<!-- Login Form -->
-			<v-form v-model="valid" @submit.prevent="submitLogin">
+			<!-- Login/Register Form -->
+			<v-form v-model="valid" @submit.prevent="handleSubmit">
 				<!-- Email Input -->
 				<v-text-field
 					v-model="email"
-					:rules="[emailRules as any]"
+					:rules="emailRules"
 					density="compact"
 					placeholder="Email address"
 					prepend-inner-icon="mdi-email-outline"
@@ -23,24 +25,10 @@
 					required
 				></v-text-field>
 
-				<!-- Password Section -->
-				<div
-					class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between mb-2"
-				>
-					Password
-					<a
-						class="text-caption text-decoration-none text-blue"
-						href="#"
-						rel="noopener noreferrer"
-						target="_blank"
-					>
-						Forgot login password?
-					</a>
-				</div>
-
 				<!-- Password Input -->
 				<v-text-field
 					v-model="password"
+					:rules="passwordRules"
 					:append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
 					:type="visible ? 'text' : 'password'"
 					density="compact"
@@ -51,17 +39,46 @@
 					required
 				></v-text-field>
 
-				<!-- Warning Message -->
-				<v-card class="mb-12" color="surface-variant" variant="tonal">
-					<v-card-text class="text-medium-emphasis text-caption">
-						Warning: After 3 consecutive failed login attempts, your
-						account will be temporarily locked for three hours. If
-						you must login now, you can also click "Forgot login
-						password?" below to reset the login password.
-					</v-card-text>
-				</v-card>
+				<!-- Confirm Password (Register only) -->
+				<v-text-field
+					v-if="!isLogin"
+					v-model="passwordConfirm"
+					:rules="[...passwordRules, passwordMatchRule]"
+					:append-inner-icon="visibleConfirm ? 'mdi-eye-off' : 'mdi-eye'"
+					:type="visibleConfirm ? 'text' : 'password'"
+					density="compact"
+					placeholder="Confirm your password"
+					prepend-inner-icon="mdi-lock-outline"
+					variant="outlined"
+					@click:append-inner="togglePasswordConfirmVisibility"
+					required
+				></v-text-field>
 
-				<!-- Login Button -->
+				<!-- Error Alert -->
+				<v-alert
+					v-if="error"
+					type="error"
+					variant="tonal"
+					class="mb-4"
+					closable
+					@click:close="error = ''"
+				>
+					{{ error }}
+				</v-alert>
+
+				<!-- Success Alert -->
+				<v-alert
+					v-if="success"
+					type="success"
+					variant="tonal"
+					class="mb-4"
+					closable
+					@click:close="success = ''"
+				>
+					{{ success }}
+				</v-alert>
+
+				<!-- Submit Button -->
 				<v-btn
 					type="submit"
 					class="mb-8"
@@ -69,20 +86,21 @@
 					size="large"
 					variant="tonal"
 					block
+					:loading="loading"
 				>
-					Log In
+					{{ isLogin ? 'Log In' : 'Register' }}
 				</v-btn>
 			</v-form>
 
-			<!-- Sign Up Link -->
+			<!-- Toggle Login/Register -->
 			<v-card-text class="text-center">
 				<a
 					class="text-blue text-decoration-none"
 					href="#"
-					rel="noopener noreferrer"
-					target="_blank"
+					@click.prevent="toggleMode"
 				>
-					Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
+					{{ isLogin ? 'Create an account' : 'Already have an account? Login' }}
+					<v-icon icon="mdi-chevron-right"></v-icon>
 				</a>
 			</v-card-text>
 		</v-card>
@@ -90,48 +108,105 @@
 </template>
 
 <script setup lang="ts">
-import { login } from '@/apis/auth';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { login, register, getCsrfToken } from '@/apis/auth';
 
-// Reactive data for email and password
+const router = useRouter();
+
+// Form data
 const email = ref('');
 const password = ref('');
-const valid = ref(false); // Form validity check
-const visible = ref(false); // Toggle password visibility
+const passwordConfirm = ref('');
+const valid = ref(false);
+const visible = ref(false);
+const visibleConfirm = ref(false);
+const loading = ref(false);
+const error = ref('');
+const success = ref('');
+const isLogin = ref(true);
 
 // Validation rules
 const emailRules = [
-	(v) => !!v || 'Email is required',
-	(v) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+	(v: string) => !!v || 'Email is required',
+	(v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
 ];
 
-// Toggle visibility for password input
+const passwordRules = [
+	(v: string) => !!v || 'Password is required',
+	(v: string) =>
+		/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v) ||
+		'Password must contain at least 8 characters, one letter, one number and one special character',
+];
+
+const passwordMatchRule = (v: string) =>
+	v === password.value || 'Passwords must match';
+
+// Toggle password visibility
 const togglePasswordVisibility = () => {
 	visible.value = !visible.value;
 };
 
-// Submit login function
-const submitLogin = async () => {
-	if (valid.value) {
-		try {
-			const response = await login({
+const togglePasswordConfirmVisibility = () => {
+	visibleConfirm.value = !visibleConfirm.value;
+};
+
+// Toggle between login and register modes
+const toggleMode = () => {
+	isLogin.value = !isLogin.value;
+	error.value = '';
+	success.value = '';
+};
+
+// Handle form submission
+const handleSubmit = async () => {
+	if (!valid.value) {
+		error.value = 'Please fix the form errors before submitting';
+		return;
+	}
+
+	loading.value = true;
+	error.value = '';
+	success.value = '';
+
+	try {
+		if (isLogin.value) {
+			await login({
 				email: email.value,
 				password: password.value,
 			});
-			console.log('Response:', response);
-			// Handle the response from the login API
-			if (response.user_id > 0) {
-				// Redirect to the next page or show a success message
-				console.log('Login successful');
-			} else {
-				// Handle login failure (e.g., show error message)
-				console.error('Login failed');
-			}
-		} catch (error) {
-			console.error('Error logging in:', error);
+			success.value = 'Login successful!';
+			setTimeout(() => {
+				router.push('/homepage');
+			}, 1500);
+		} else {
+			await register({
+				email: email.value,
+				password: password.value,
+				password_confirm: passwordConfirm.value,
+			});
+			success.value = 'Registration successful! Please login.';
+			setTimeout(() => {
+				isLogin.value = true;
+				password.value = '';
+				passwordConfirm.value = '';
+			}, 1500);
 		}
-	} else {
-		console.log('Form is not valid');
+	} catch (err: any) {
+		error.value =
+			err.response?.data?.message ||
+			'An error occurred. Please try again later.';
+	} finally {
+		loading.value = false;
 	}
 };
+
+// Get CSRF token on component mount
+onMounted(async () => {
+	try {
+		await getCsrfToken();
+	} catch (err) {
+		error.value = 'Failed to initialize security token. Please refresh the page.';
+	}
+});
 </script>

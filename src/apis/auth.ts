@@ -1,42 +1,80 @@
-import { requestWithDiscovery } from '@/utils/httpWithDiscovery';
-// 定义登录请求数据结构
+import axios from 'axios';
+
+const BASE_URL = 'http://192.168.110.112:8888';
+
+// Initialize axios instance with base configuration
+const api = axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true, // Enable sending cookies
+});
+
+// Add request interceptor to include CSRF token
+api.interceptors.request.use((config) => {
+    const csrfToken = localStorage.getItem('csrfToken');
+    if (csrfToken) {
+        config.headers['csrf'] = csrfToken;
+    }
+    return config;
+});
+
+// Interface definitions
 export interface LoginRequest {
-	email: string;
-	password: string;
+    email: string;
+    password: string;
 }
 
-// 定义登录响应数据结构
 export interface LoginResponse {
-	user_id: number;
-	token: string;
+    user_id: number;
+    token: string;
 }
 
-// 登录 API（使用服务发现）
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
-	return requestWithDiscovery('user-service', '/login', {
-		method: 'POST',
-		data,
-	});
+export interface RegisterRequest {
+    email: string;
+    password: string;
+    password_confirm: string;
+}
+
+export interface RegisterResponse {
+    userId: number;
+}
+
+// Get CSRF token
+export const getCsrfToken = async (): Promise<string> => {
+    try {
+        const response = await api.get('/hello');
+        const token = response.data.RespBody;
+        localStorage.setItem('csrfToken', token);
+        return token;
+    } catch (error) {
+        console.error('Failed to get CSRF token:', error);
+        throw error;
+    }
 };
 
-// 定义注册请求数据结构
-export interface RegisterRequest {
-	email: string;
-	password: string;
-	passwordConfirm: string;
-}
+// Login API
+export const login = async (data: LoginRequest): Promise<LoginResponse> => {
+    try {
+        const response = await api.post('/login', data);
+        return response.data;
+    } catch (error) {
+        console.error('Login failed:', error);
+        throw error;
+    }
+};
 
-// 定义注册响应数据结构
-export interface RegisterResponse {
-	userId: number;
-}
+// Register API
+export const register = async (data: RegisterRequest): Promise<RegisterResponse> => {
+    try {
+        const response = await api.post('/register', data);
+        return response.data;
+    } catch (error) {
+        console.error('Registration failed:', error);
+        throw error;
+    }
+};
 
-// 注册 API（使用服务发现）
-export const register = async (
-	data: RegisterRequest
-): Promise<RegisterResponse> => {
-	return requestWithDiscovery('user-service', '/register', {
-		method: 'POST',
-		data,
-	});
+// Logout function - clears the JWT cookie
+export const logout = async (): Promise<void> => {
+    document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    localStorage.removeItem('csrfToken');
 };
