@@ -6,6 +6,7 @@
 - Tailwind CSS 用于样式开发
 - Pinia 用于状态管理
 - Vuetify 和 Ant Design Vue 作为 UI 组件库
+- axios 用于请求和通信
 
 项目主要功能：
 - 用户认证和授权
