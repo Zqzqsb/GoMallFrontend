@@ -1,7 +1,7 @@
 <template>
-	<homepage></homepage>
+	<intro />
 </template>
 
 <script setup lang="ts">
-import homepage from './homepage/index.vue';
+import intro from './intro/index.vue';
 </script>
