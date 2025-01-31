@@ -5,7 +5,7 @@
 
         <v-container class="fill-height">
             <v-row class="fill-height" align="center" justify="center">
-                <v-col cols="12" md="10">
+                <v-col cols="12" md="12" lg="11" xl="10">
                     <!-- 项目标题和仓库链接 -->
                     <Header />
                     
@@ -15,9 +15,9 @@
                     </div>
                     
                     <!-- 技术栈轮播和进入按钮 -->
-                    <div class="d-flex align-center gap-4">
+                    <div class="d-flex align-center gap-6">
                         <TechStack class="flex-grow-1" />
-                        <EnterButton />
+                        <EnterButton class="flex-shrink-0" />
                     </div>
                 </v-col>
             </v-row>
@@ -44,6 +44,9 @@ import EnterButton from './components/EnterButton.vue';
 .v-container {
     position: relative;
     z-index: 1;
+    max-width: 2000px;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
 :deep(.v-btn) {

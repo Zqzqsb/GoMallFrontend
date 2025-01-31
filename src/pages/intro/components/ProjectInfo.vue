@@ -115,10 +115,13 @@ const activeTab = ref('background');
 
 .feature-section {
     color: rgba(255, 255, 255, 1);
-    padding: 16px;
+    padding: 24px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .feature-section:hover {
@@ -130,14 +133,16 @@ const activeTab = ref('background');
     list-style-type: none;
     padding: 0;
     margin: 0;
+    flex-grow: 1;
 }
 
 .feature-list li {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     padding-left: 20px;
     position: relative;
     color: rgba(255, 255, 255, 1);
     font-weight: 500;
+    line-height: 1.5;
 }
 
 .feature-list li::before {
@@ -151,6 +156,8 @@ const activeTab = ref('background');
     color: rgba(255, 255, 255, 0.9);
     text-transform: none;
     font-weight: 500;
+    font-size: 1.1rem;
+    height: 48px;
 }
 
 :deep(.v-tab--selected) {
@@ -165,11 +172,18 @@ const activeTab = ref('background');
 :deep(.text-body-1) {
     color: white !important;
     font-weight: 500;
+    line-height: 1.6;
 }
 
 :deep(.text-h6) {
     color: white !important;
     font-weight: 700;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+}
+
+:deep(.v-card-text) {
+    padding: 24px;
 }
 
 .reveal-element {
