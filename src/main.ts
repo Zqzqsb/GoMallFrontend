@@ -6,6 +6,10 @@ import { getCsrfToken } from '@/apis/auth';
 import { createRouter, createWebHistory } from 'vue-router';
 import { routes } from 'vue-router/auto-routes';
 
+// Pinia Store
+import { createPinia } from 'pinia';
+const pinia = createPinia();
+
 const router = createRouter({
 	history: createWebHistory(),
 	routes,
@@ -28,4 +32,8 @@ getCsrfToken().catch(error => {
     console.error('Failed to fetch CSRF token on startup:', error);
 });
 
-createApp(App).use(vuetify).use(router).mount('#app');
+createApp(App)
+    .use(pinia)     // 添加 Pinia
+    .use(vuetify)
+    .use(router)
+    .mount('#app');
