@@ -24,8 +24,10 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-    user_id: number;
-    token: string;
+    code: number;       // 响应状态码
+    message?: string;   // 可选的响应消息
+    user_id: number;    // 用户ID
+    token: string;      // 认证token
 }
 
 export interface RegisterRequest {
@@ -35,7 +37,9 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-    userId: number;
+    code?: number;      // 可能的响应状态码
+    message?: string;   // 可能的响应消息
+    user_id: number;    // 与前端代码一致，使用user_id
 }
 
 // Get CSRF token
