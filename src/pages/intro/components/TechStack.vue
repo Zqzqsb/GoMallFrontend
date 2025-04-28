@@ -177,12 +177,12 @@ const techStacks = [
 				description: '日志分析平台',
 			},
 			{
-				name: 'Kong Gateway',
-				icon: 'mdi-gate',
-				description: 'API 网关服务',
+				name: 'Grafana',
+				icon: 'mdi-gauge',
+				description: '监控可视化平台',
 			},
 			{
-				name: 'Apollo',
+				name: 'Consul',
 				icon: 'mdi-cog-sync',
 				description: '配置中心服务',
 			},
