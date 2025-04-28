@@ -16,17 +16,17 @@
 			hide-details
 			@click:append-inner="searchProducts"
 			class="mx-2"
-			style="max-width: 300px;"
+			style="max-width: 300px"
 		></v-text-field>
 
 		<v-btn
 			color="primary"
 			variant="text"
 			class="ml-2 hidden-sm-and-down"
-			to="/products"
-			prepend-icon="mdi-shopping"
+			to="/intro"
+			prepend-icon="mdi-information"
 		>
-			全部商品
+			项目介绍
 		</v-btn>
 
 		<v-btn icon class="ml-2" @click="goToCart">
@@ -48,12 +48,21 @@
 					:color="isLoggedIn ? 'primary' : undefined"
 					class="ml-2"
 				>
-					<v-avatar v-if="isLoggedIn && userAvatar" size="32" class="user-avatar">
+					<v-avatar
+						v-if="isLoggedIn && userAvatar"
+						size="32"
+						class="user-avatar"
+					>
 						<v-img :src="userAvatar" alt="用户头像"></v-img>
 					</v-avatar>
-					<v-avatar v-else-if="isLoggedIn" size="32" color="primary" class="user-avatar">
-                        <span class="text-white">{{ userNameInitial }}</span>
-                    </v-avatar>
+					<v-avatar
+						v-else-if="isLoggedIn"
+						size="32"
+						color="primary"
+						class="user-avatar"
+					>
+						<span class="text-white">{{ userNameInitial }}</span>
+					</v-avatar>
 					<v-icon v-else>mdi-account-circle</v-icon>
 				</v-btn>
 			</template>
@@ -68,7 +77,9 @@
 									:src="userAvatar"
 									alt="用户头像"
 								></v-img>
-                                <span v-else class="text-white">{{ userNameInitial }}</span>
+								<span v-else class="text-white">{{
+									userNameInitial
+								}}</span>
 							</v-avatar>
 						</template>
 						<v-list-item-title>{{ userName }}</v-list-item-title>
@@ -105,13 +116,13 @@
 							prepend-icon="mdi-login"
 							title="登录"
 							to="/login"
-                            @click="menu = false"
+							@click="menu = false"
 						></v-list-item>
 						<v-list-item
 							prepend-icon="mdi-account-plus"
 							title="注册"
 							to="/login?mode=register"
-                            @click="menu = false"
+							@click="menu = false"
 						></v-list-item>
 					</template>
 				</v-list>
@@ -148,58 +159,58 @@ const cartItemCount = computed(() => cartStore.itemCount);
 
 // 搜索商品
 const searchProducts = () => {
-    if (!search.value.trim()) return;
-    
-    loading.value = true;
-    
-    // 模拟搜索延迟
-    setTimeout(() => {
-        loading.value = false;
-        router.push({
-            path: '/products',
-            query: { keyword: search.value }
-        });
-        search.value = '';
-    }, 500);
+	if (!search.value.trim()) return;
+
+	loading.value = true;
+
+	// 模拟搜索延迟
+	setTimeout(() => {
+		loading.value = false;
+		router.push({
+			path: '/products',
+			query: { keyword: search.value },
+		});
+		search.value = '';
+	}, 500);
 };
 
 // 跳转到购物车
 const goToCart = () => {
-    router.push('/cart');
+	router.push('/cart');
 };
 
 // 退出登录
 const handleLogout = () => {
-    authStore.logout();
-    menu.value = false;
-    router.push('/');
+	authStore.logout();
+	menu.value = false;
+	router.push('/');
 };
 </script>
 
 <style scoped>
 .user-avatar {
-    transition: transform 0.3s, box-shadow 0.3s;
+	transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .user-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	transform: scale(1.05);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .user-menu-card {
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+	overflow: hidden;
+	transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .user-menu-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* 增加响应式样式 */
 @media (max-width: 600px) {
-  .v-text-field {
-    max-width: 150px !important;
-  }
+	.v-text-field {
+		max-width: 150px !important;
+	}
 }
 </style>
