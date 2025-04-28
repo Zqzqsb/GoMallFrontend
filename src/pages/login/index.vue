@@ -283,9 +283,12 @@ const handleSubmit = async () => {
             });
             
             // 检查响应中是否包含必要的数据
-            if (!response || !response.token) {
+            if (!response || !response.code || response.code !== 200 || !response.token) {
                 throw new Error('登录失败：无效的响应数据');
             }
+            
+            // 保存 token 到 localStorage 或 pinia store
+            localStorage.setItem('token', response.token);
             
             success.value = '登录成功！';
             error.value = '';
@@ -304,7 +307,7 @@ const handleSubmit = async () => {
             });
             
             // 检查响应中是否包含必要的数据
-            if (!response || !response.userId) {
+            if (!response || !response.user_id) {
                 throw new Error('注册失败：无效的响应数据');
             }
             
@@ -320,7 +323,34 @@ const handleSubmit = async () => {
     } catch (err: any) {
         console.error('Error:', err);
         success.value = '';
-        error.value = err.response?.data?.message || '服务器响应异常';
+        
+        // 改进错误处理逻辑，优先使用后端返回的错误信息
+        if (err.response && err.response.data) {
+            // 如果后端返回的是字符串错误信息
+            if (typeof err.response.data === 'string') {
+                const errorMsg = err.response.data;
+                
+                // 处理特定的错误消息，转换为更友好的中文提示
+                if (errorMsg.includes('邮箱已被注册')) {
+                    error.value = '该邮箱已被注册，请使用其他邮箱或直接登录';
+                } else if (errorMsg.includes('Registration failed')) {
+                    error.value = '注册失败: ' + errorMsg.replace('Registration failed:', '').trim();
+                } else {
+                    error.value = errorMsg;
+                }
+            } 
+            // 如果后端返回的是对象，包含 message 字段
+            else if (err.response.data.message) {
+                error.value = err.response.data.message;
+            }
+            // 其他情况
+            else {
+                error.value = `服务器响应异常 (${err.response.status})`;
+            }
+        } else {
+            error.value = err.message || '未知错误';
+        }
+        
         return;
     } finally {
         loading.value = false;
