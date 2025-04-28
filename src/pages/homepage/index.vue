@@ -1,27 +1,29 @@
 <template>
-	<HomepageLayout>
+	<div class="homepage-container">
 		<Banner />
-		<v-main>
+		<v-main class="homepage-content">
 			<ProductDisplay />
 		</v-main>
-	</HomepageLayout>
+		<Footer />
+	</div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import HomepageLayout from '@/layout/HomepageLayout.vue';
 import Banner from './Banner.vue';
 import ProductDisplay from './ProductDisplay.vue';
+import Footer from './Footer.vue';
 </script>
 
 <style scoped>
-.homepage {
+.homepage-container {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
 }
 
-.v-main {
+.homepage-content {
 	flex: 1 0 auto;
+	padding-top: 24px;
 }
 </style>
