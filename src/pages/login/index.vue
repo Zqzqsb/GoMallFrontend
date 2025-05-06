@@ -1,5 +1,8 @@
 <template>
 	<AuthLayout>
+		<!-- 登录服务错误处理组件 -->
+		<LoginErrorHandler ref="loginErrorHandlerRef" />
+		
 		<v-fade-transition>
 			<div class="pa-8">
 				<!-- Title Section -->
@@ -137,14 +140,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthLayout from '@/layout/AuthLayout.vue';
 import { login, register } from '@/apis/auth';
 import { useAuthStore } from '@/store/authStore';
+import LoginErrorHandler from '@/components/LoginErrorHandler.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const loginErrorHandlerRef = ref<InstanceType<typeof LoginErrorHandler> | null>(null);
+
+// 组件挂载时检查登录服务是否可用
+onMounted(async () => {
+  // 检查登录服务状态
+  if (loginErrorHandlerRef.value) {
+    await loginErrorHandlerRef.value.detectLoginServiceFailure();
+  }
+});
 
 // Form state
 const valid = ref(false);
@@ -162,7 +175,7 @@ const emailError = ref('');
 const passwordError = ref('');
 const confirmError = ref('');
 
-// Password visibility
+// 密码可见性控制
 const visible = ref(false);
 const visibleConfirm = ref(false);
 
@@ -190,42 +203,30 @@ const passwordRules = [
 
 		// 检查密码长度（8-20位）
 		if (v.length < 8 || v.length > 20) {
-			passwordError.value = '密码长度必须在8-20位之间';
+			passwordError.value = '密码长度必须为8-20位';
 			return false;
 		}
 
-		// 检查是否包含至少一个大写字母
-		if (!/[A-Z]/.test(v)) {
-			passwordError.value = '密码必须包含至少一个大写字母';
-			return false;
-		}
+		// 检查密码组成（至少包含大小写字母、数字和特殊字符中的三种）
+		let count = 0;
+		if (/[A-Z]/.test(v)) count++; // 包含大写字母
+		if (/[a-z]/.test(v)) count++; // 包含小写字母
+		if (/[0-9]/.test(v)) count++; // 包含数字
+		if (/[^A-Za-z0-9]/.test(v)) count++; // 包含特殊字符
 
-		// 检查是否包含至少一个小写字母
-		if (!/[a-z]/.test(v)) {
-			passwordError.value = '密码必须包含至少一个小写字母';
-			return false;
-		}
-
-		// 检查是否包含至少一个数字
-		if (!/\d/.test(v)) {
-			passwordError.value = '密码必须包含至少一个数字';
-			return false;
-		}
-
-		// 检查是否包含至少一个特殊字符
-		if (!/[!@#$%^&*(),.?":{}|<>]/.test(v)) {
+		if (count < 3) {
 			passwordError.value =
-				'密码必须包含至少一个特殊字符 (!@#$%^&*(),.?":{}|<>)';
+				'密码必须包含大小写字母、数字和特殊字符中的至少三种';
 			return false;
 		}
 
-		// 检查是否包含连续的重复字符
-		if (/(.)\1{2,}/.test(v)) {
-			passwordError.value = '密码不能包含连续重复的字符';
+		// 检查密码是否含有用户邮箱
+		if (email.value && v.includes(email.value.split('@')[0])) {
+			passwordError.value = '密码不能包含您的用户名';
 			return false;
 		}
 
-		// 检查是否包含常见的键盘连续字符
+		// 检查是否含有常见键盘序列
 		const commonSequences = ['qwerty', 'asdfgh', '123456', 'abcdef'];
 		if (commonSequences.some((seq) => v.toLowerCase().includes(seq))) {
 			passwordError.value = '密码不能包含连续的键盘字符';
@@ -295,6 +296,16 @@ const handleSubmit = async () => {
 	success.value = '';
 
 	try {
+		// 在尝试登录/注册前先检查登录服务是否可用
+		if (loginErrorHandlerRef.value) {
+			const isLoginServiceAvailable = await loginErrorHandlerRef.value.detectLoginServiceFailure();
+			if (!isLoginServiceAvailable) {
+				// 登录服务不可用，由LoginErrorHandler组件处理
+				loading.value = false;
+				return;
+			}
+		}
+		
 		if (isLogin.value) {
 			const response = await login({
 				email: email.value,
@@ -350,6 +361,16 @@ const handleSubmit = async () => {
 	} catch (err: any) {
 		console.error('Error:', err);
 		success.value = '';
+
+		// 检查是否为网关错误（502 Bad Gateway）
+		if (err.status === 502 || (err.response && err.response.status === 502)) {
+			// 显示登录服务不可用的友好提示
+			if (loginErrorHandlerRef.value) {
+				loginErrorHandlerRef.value.showLoginError = true;
+				loading.value = false;
+				return;
+			}
+		}
 
 		// 改进错误处理逻辑，优先使用后端返回的错误信息
 		if (err.response && err.response.data) {

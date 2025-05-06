@@ -86,3 +86,23 @@ export const logout = async (): Promise<void> => {
 	document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 	localStorage.removeItem('csrfToken');
 };
+
+// 检查认证服务状态
+export const checkAuthServiceStatus = async (): Promise<boolean> => {
+	try {
+		// 使用较短的超时时间，避免长时间等待
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 3000);
+		
+		// 使用一个轻量级的端点来检查服务可用性
+		const response = await api.get('/auth/status', {
+			signal: controller.signal,
+		});
+		
+		clearTimeout(timeoutId);
+		return response.status === 200;
+	} catch (error) {
+		console.error('Auth service status check failed:', error);
+		return false;
+	}
+};
